@@ -21,6 +21,7 @@ async function scrapeDoujindesu(url) {
       let fallbackTime = $(el).find('.dtch').text().trim();
       fallbackTime = fallbackTime.replace(/hri/g, 'hari');
       const label = rawLabel || fallbackTime || null;
+      const chapter_endpoint = $(el).find('.artists a').attr('href');
       const type = $(el).find('span.type').text().trim();
 
       results.push({
@@ -30,6 +31,7 @@ async function scrapeDoujindesu(url) {
         chapter,
         label,
         type,
+        chapter_endpoint
       });
     });
 
