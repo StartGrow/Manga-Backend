@@ -4,7 +4,7 @@ const {baseUrl, baseApi} = require("../constants/urls");
 const replaceMangaPage = "https://komiku.id/manga/";
 const AxiosService = require("../helpers/axiosService");
 const { ManhwalandL, ManhwalandChapter, ManhwalandDetail, ManhwalandSearch, ManhwalandTags, ManhwalandGenreList } = require("../helpers/manhwaland");
-const { scrapeDoujindesu, DoujindesuDetail, DoujindesuChapter, DoujindesuSearch } = require("../helpers/doujindesu-proxy");
+const { scrapeDoujindesu, DoujindesuDetail, DoujindesuChapter, DoujindesuSearch, DoujindesuGenres } = require("../helpers/doujindesu-proxy");
 
 
 
@@ -59,6 +59,24 @@ router.get('/doujindesu/search', async (req, res) => {
     res.json(allResults);
 });
 
+router.get('/doujindesu/genre/:genre', async (req, res) => {
+    try {
+        const genre = req.params.genre;
+        const page = req.query.page ? parseInt(req.query.page) : 1;
+
+        let json = await DoujindesuGenres(genre, page);
+        res.status(200).json({
+            status: true,
+            message: "success",
+            result: json.results,
+            prevPage: page > 1 ? page - 1 : null,
+            nextPage: json.nextPage,
+        });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
 // manga popular ----Ignore this for now --------
 router.get("/manga/popular", async (req, res) => {
   res.send({
@@ -80,7 +98,7 @@ router.get('/manhwaland/genre/:genre', async (req, res) => {
         const genre = req.params.genre;
         const page = req.query.page ? parseInt(req.query.page) : 1;
 
-        let json = await ManhwalandTags(genre, page);
+        let json = await DoujindesuGenres(genre, page);
         res.status(200).json({
             status: true,
             message: "success",
