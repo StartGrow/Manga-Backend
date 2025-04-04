@@ -70,7 +70,7 @@ async function DoujindesuDetail(url) {
 
     const genres = [];
     $("section.metadata .tags a").each((i, el) => {
-      const url = $(el).attr("href").replace(/^\/+/, '') || '';
+      const url = $(el).attr("href");
       const slug = url.split("/genre/")[1].replace(/\//g, "");
       const name = $(el).text().trim();
       genres.push({ name, slug, url });
