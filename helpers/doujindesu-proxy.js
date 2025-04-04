@@ -14,7 +14,7 @@ async function scrapeDoujindesu(url) {
 
     $('.entry').each((i, el) => {
       const title = $(el).find('h3.title span').text().trim();
-      const endpoint = $(el).find('a').attr('href');
+      const endpoint = $(el).find('a').attr('href')?.replace(/^\/+/, '') || '';
       const thumbnail = $(el).find('img').attr('src');
       const chapter = $(el).find('.artists a span').text().trim();
       const rawLabel = $(el).find('.newchlabel').text().trim();
@@ -53,7 +53,7 @@ async function scrapeDoujindesu(url) {
 
 async function DoujindesuDetail(url) {
   try {
-    const { data } = await axios.get(`https://kyouka-proxy.hf.space/pages?url=${url}`);
+    const { data } = await axios.get(`https://kyouka-proxy.hf.space/pages?url=https://doujindesu.tv/${url}`);
     const $ = cheerio.load(data);
 
     const title = $("section.metadata h1.title").clone().children().remove().end().text().trim();
