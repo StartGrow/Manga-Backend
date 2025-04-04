@@ -4,7 +4,7 @@ const {baseUrl, baseApi} = require("../constants/urls");
 const replaceMangaPage = "https://komiku.id/manga/";
 const AxiosService = require("../helpers/axiosService");
 const { ManhwalandL, ManhwalandChapter, ManhwalandDetail, ManhwalandSearch, ManhwalandTags, ManhwalandGenreList } = require("../helpers/manhwaland");
-const { scrapeDoujindesu, DoujindesuDetail, DoujindesuChapter } = require("../helpers/doujindesu-proxy");
+const { scrapeDoujindesu, DoujindesuDetail, DoujindesuChapter, DoujindesuSearch } = require("../helpers/doujindesu-proxy");
 
 
 
@@ -48,6 +48,15 @@ router.get('/doujindesu/chapter/:slug', async (req, res) => {
     } catch (e) {
         res.status(500).json({ error: e.message });
     }
+});
+
+router.get('/doujindesu/search', async (req, res) => {
+    const query = req.query.q;
+    if (!query) {
+        return res.status(400).json({ error: 'Query parameter q is required' });
+    }
+    const allResults = await  DoujindesuSearch(query);
+    res.json(allResults);
 });
 
 // manga popular ----Ignore this for now --------
