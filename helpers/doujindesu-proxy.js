@@ -79,7 +79,7 @@ async function DoujindesuDetail(url) {
     const chapters = [];
     $("#chapter_list ul li").each((i, el) => {
       const title = $(el).find(".lchx a").text().trim();
-      const chapterPath = $(el).find(".eps a").attr("href");
+      const chapterPath = $(el).find(".eps a").attr("href").replace(/^\/+/, '') || '';
       const uploadDate = $(el).find(".date").text().trim();
       chapters.push({ title, chapterUrl: chapterPath, uploadDate });
     });
