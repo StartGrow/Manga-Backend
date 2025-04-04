@@ -4,6 +4,24 @@ const {baseUrl, baseApi} = require("../constants/urls");
 const replaceMangaPage = "https://komiku.id/manga/";
 const AxiosService = require("../helpers/axiosService");
 const { ManhwalandL, ManhwalandChapter, ManhwalandDetail, ManhwalandSearch, ManhwalandTags, ManhwalandGenreList } = require("../helpers/manhwaland");
+const { scrapeDoujindesu } = require("../helpers/doujindesu-proxy");
+
+
+
+//Doujindesu Home
+router.get('/doujindesu', async (req, res) => {
+    try {
+        let json = await scrapeDoujindesu();
+        res.status(200).json({
+            status: json.data.status,
+            message: "success",
+            result: json.data.results,
+        });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
 
 // manga popular ----Ignore this for now --------
 router.get("/manga/popular", async (req, res) => {
