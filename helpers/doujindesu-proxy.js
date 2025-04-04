@@ -58,7 +58,7 @@ async function DoujindesuDetail(slug) {
 
     const title = $("section.metadata h1.title").clone().children().remove().end().text().trim();
     const altTitle = $("section.metadata h1.title .alter i").text().trim();
-    const thumbnail = $("aside figure.thumbnail img").attr("src");
+    const thumbnail = $("aside figure.thumbnail img").attr("src")?.replace('https://doujindesu.tv', 'https://cdn.doujindesu.dev');
 
     const tableRows = $("section.metadata table tr");
     const metadata = {};
@@ -142,7 +142,7 @@ async function DoujindesuSearch(query) {
       const title = element.find('h3.title span').text().trim();
       const rawLink = element.find('a').attr('href');
       const link = 'https://doujindesu.tv' + rawLink;
-      const thumbnail = element.find('figure.thumbnail img').attr('src');
+      const thumbnail = element.find('figure.thumbnail img').attr('src')?.replace('https://doujindesu.tv', 'https://cdn.doujindesu.dev');
       const type = element.find('figure.thumbnail span.type').text().trim();
       const score = element.find('.score').text().trim().replace(/\s+/g, '');
       const status = element.find('.status').text().trim();
@@ -184,7 +184,7 @@ async function DoujindesuGenres(genre, page = 1) {
       const link = `${baseDoujindesu}${rawLink}`;
       const slug = rawLink.replace(/^\/manga\//, '').replace(/\/$/, '');
       const title = element.find('h3.title span').text().trim();
-      const thumbnail = element.find('figure.thumbnail img').attr('src');
+      const thumbnail = element.find('figure.thumbnail img').attr('src')?.replace('https://doujindesu.tv', 'https://cdn.doujindesu.dev');
       const type = element.find('figure.thumbnail span.type').text().trim();
       const score = element.find('.score').text().trim();
       const status = element.find('.status').text().trim();
