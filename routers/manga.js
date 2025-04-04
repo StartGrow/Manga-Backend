@@ -4,7 +4,7 @@ const {baseUrl, baseApi} = require("../constants/urls");
 const replaceMangaPage = "https://komiku.id/manga/";
 const AxiosService = require("../helpers/axiosService");
 const { ManhwalandL, ManhwalandChapter, ManhwalandDetail, ManhwalandSearch, ManhwalandTags, ManhwalandGenreList } = require("../helpers/manhwaland");
-const { scrapeDoujindesu, DoujindesuDetail } = require("../helpers/doujindesu-proxy");
+const { scrapeDoujindesu, DoujindesuDetail, DoujindesuChapter } = require("../helpers/doujindesu-proxy");
 
 
 
@@ -26,6 +26,20 @@ router.get('/doujindesu/detail/:slug', async (req, res) => {
     const slug = req.params.slug;
     try {
         let json = await DoujindesuDetail(slug);
+        res.status(200).json({
+            status: true,
+            message: "success",
+            result: json,
+        });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+router.get('/doujindesu/chapter/:slug', async (req, res) => {
+    const slug = req.params.slug;
+    try {
+        let json = await DoujindesuChapter(slug);
         res.status(200).json({
             status: true,
             message: "success",
