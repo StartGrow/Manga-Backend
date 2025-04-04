@@ -166,9 +166,44 @@ async function DoujindesuSearch(query) {
   }
 }
 
+async function DoujindesuGenres(genre) {
+  const url = `https://kyouka-proxy.hf.space/pages?url=https://doujindesu.tv/genre/${genre}?order=populer`;
+  try {
+    const { data } = await axios.get(url);
+    const $ = cheerio.load(data);
+    const results = [];
+    $('article.entry').each((_, el) => {
+      const element = $(el);
+      const rawLink = element.find('a').attr('href');
+      const link = `https://doujindesu.tv${rawLink}`;
+      const slug = rawLink.replace(/^\/manga\//, '').replace(/\/$/, '');
+      const title = element.find('h3.title span').text().trim();
+      const thumbnail = element.find('figure.thumbnail img').attr('src');
+      const type = element.find('figure.thumbnail span.type').text().trim();
+      const score = element.find('.score').text().trim();
+      const status = element.find('.status').text().trim();
+      results.push({
+        title,
+        type,
+        score,
+        status,
+        link,
+        thumbnail,
+        slug
+      });
+    });
+
+    return results;
+  } catch (err) {
+    console.error(`Error fetching genre ${genre}:`, err.message);
+    return [];
+  }
+}
+
 module.exports = {
     scrapeDoujindesu,
     DoujindesuDetail,
     DoujindesuChapter,
-    DoujindesuSearch
+    DoujindesuSearch,
+    DoujindesuGenres
 };
