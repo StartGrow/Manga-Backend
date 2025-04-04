@@ -5,7 +5,7 @@ const cheerio = require('cheerio');
  * Scrape data dari halaman Doujindesu menggunakan proxy.
  * @returns {Promise<object>} - Data hasil scrape dalam format JSON
  */
-async function scrapeDoujindesu(url) {
+async function scrapeDoujindesu() {
   try {
     const response = await axios.get("https://kyouka-proxy.hf.space/pages?url=https://doujindesu.tv");
     const html = response.data;
@@ -51,9 +51,9 @@ async function scrapeDoujindesu(url) {
   }
 }
 
-async function DoujindesuDetail(url) {
+async function DoujindesuDetail(slug) {
   try {
-    const { data } = await axios.get(`https://kyouka-proxy.hf.space/pages?url=https://doujindesu.tv/manga/${url}`);
+    const { data } = await axios.get(`https://kyouka-proxy.hf.space/pages?url=https://doujindesu.tv/manga/${slug}`);
     const $ = cheerio.load(data);
 
     const title = $("section.metadata h1.title").clone().children().remove().end().text().trim();
@@ -104,7 +104,33 @@ async function DoujindesuDetail(url) {
   }
 }
 
+async function DoujindesuChapter(slug) {
+  try {
+    const { data } = await axios.get(`https://kyouka-proxy.hf.space/pages?url=https://doujindesu.tv/${slug}`);
+    const $ = cheerio.load(data);
+    const title = $("script + h1").first().text().trim();
+    const dateRelease = $(".epx").first().contents().filter(function () {
+      return this.type === "text";
+    }).text().trim().replace(/,\s*in$/, '');
+    const images = [];
+    $("#anu img").each((_, el) => {
+      const src = $(el).attr("src");
+      if (src) images.push(encodeURI(src));
+    });
+    return {
+      title,
+      date: dateRelease,
+      images,
+      total: images.length
+    };
+  } catch (error) {
+    console.error("Failed to fetch chapter:", error.message);
+    return null;
+  }
+}
+
 module.exports = {
     scrapeDoujindesu,
-    DoujindesuDetail
+    DoujindesuDetail,
+    DoujindesuChapter
 };
