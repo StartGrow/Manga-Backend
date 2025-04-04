@@ -36,8 +36,15 @@ router.get('/doujindesu/detail/:slug', async (req, res) => {
     }
 });
 
-router.get('/doujindesu/chapter/:slug', async (req, res) => {
-    const slug = req.params.slug;
+router.get('/doujindesu/chapter', async (req, res) => {
+    const { slug } = req.query; 
+    if (!slug) {
+        return res.status(400).json({
+            status: false,
+            message: "Slug is required",
+        });
+    }
+    
     try {
         let json = await DoujindesuChapter(slug);
         res.status(200).json({
