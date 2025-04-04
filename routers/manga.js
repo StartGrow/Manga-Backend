@@ -13,7 +13,7 @@ router.get('/doujindesu', async (req, res) => {
     try {
         let json = await scrapeDoujindesu();
         res.status(200).json({
-            status: json.data.status,
+            status: json.status,
             message: "success",
             result: json.data.results,
         });
