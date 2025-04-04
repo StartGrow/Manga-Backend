@@ -51,6 +51,60 @@ async function scrapeDoujindesu(url) {
   }
 }
 
+async function DoujindesuDetail(url) {
+  try {
+    const { data } = await axios.get(`https://kyouka-proxy.hf.space/pages?url=${url}`);
+    const $ = cheerio.load(data);
+
+    const title = $("section.metadata h1.title").clone().children().remove().end().text().trim();
+    const altTitle = $("section.metadata h1.title .alter i").text().trim();
+    const thumbnail = $("aside figure.thumbnail img").attr("src");
+
+    const tableRows = $("section.metadata table tr");
+    const metadata = {};
+    tableRows.each((i, el) => {
+      const key = $(el).find("td").first().text().trim().toLowerCase();
+      const value = $(el).find("td").last().text().trim();
+      metadata[key] = value;
+    });
+
+    const genres = [];
+    $("section.metadata .tags a").each((i, el) => {
+      const url = $(el).attr("href");
+      const slug = url.split("/genre/")[1].replace(/\//g, "");
+      const name = $(el).text().trim();
+      genres.push({ name, slug, url });
+    });
+
+    const chapters = [];
+    $("#chapter_list ul li").each((i, el) => {
+      const title = $(el).find(".lchx a").text().trim();
+      const chapterPath = $(el).find(".eps a").attr("href");
+      const uploadDate = $(el).find(".date").text().trim();
+      chapters.push({ title, chapterUrl: chapterPath, uploadDate });
+    });
+
+    return {
+      title,
+      altTitle,
+      thumbnail,
+      status: metadata["status"] || null,
+      type: metadata["type"] || null,
+      series: metadata["series"] || null,
+      author: metadata["author"] || null,
+      group: metadata["group"] || null,
+      rating: metadata["rating"] || null,
+      createdDate: metadata["created date"] || null,
+      genres,
+      chapters,
+    };
+  } catch (err) {
+    console.error("Error in DoujindesuDetail:", err.message);
+    return null;
+  }
+}
+
 module.exports = {
-    scrapeDoujindesu
+    scrapeDoujindesu,
+    DoujindesuDetail
 };
