@@ -98,7 +98,7 @@ router.get('/manhwaland/genre/:genre', async (req, res) => {
         const genre = req.params.genre;
         const page = req.query.page ? parseInt(req.query.page) : 1;
 
-        let json = await DoujindesuGenres(genre, page);
+        let json = await ManhwalandTags(genre, page);
         res.status(200).json({
             status: true,
             message: "success",
