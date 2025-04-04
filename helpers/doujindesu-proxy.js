@@ -166,22 +166,29 @@ async function DoujindesuSearch(query) {
   }
 }
 
-async function DoujindesuGenres(genre) {
-  const url = `https://kyouka-proxy.hf.space/pages?url=https://doujindesu.tv/genre/${genre}?order=populer`;
+async function DoujindesuGenres(genre, page = 1) {
+  const baseDoujindesu = 'https://doujindesu.tv';
+  const baseProxy = 'https://kyouka-proxy.hf.space/pages?url=';
+  const url = page === 1
+    ? `${baseProxy}${baseDoujindesu}/genre/${genre}?order=populer`
+    : `${baseProxy}${baseDoujindesu}/genre/${genre}/page/${page}/?order=populer`;
+
   try {
     const { data } = await axios.get(url);
     const $ = cheerio.load(data);
     const results = [];
+
     $('article.entry').each((_, el) => {
       const element = $(el);
       const rawLink = element.find('a').attr('href');
-      const link = `https://doujindesu.tv${rawLink}`;
+      const link = `${baseDoujindesu}${rawLink}`;
       const slug = rawLink.replace(/^\/manga\//, '').replace(/\/$/, '');
       const title = element.find('h3.title span').text().trim();
       const thumbnail = element.find('figure.thumbnail img').attr('src');
       const type = element.find('figure.thumbnail span.type').text().trim();
       const score = element.find('.score').text().trim();
       const status = element.find('.status').text().trim();
+
       results.push({
         title,
         type,
@@ -192,11 +199,26 @@ async function DoujindesuGenres(genre) {
         slug
       });
     });
-
-    return results;
+    let nextPage = null;
+    const nextBtn = $('li.last a[title="Next page"]').attr('href');
+    if (nextBtn) {
+      const match = nextBtn.match(/\/page\/(\d+)\//);
+      if (match) {
+        nextPage = parseInt(match[1]);
+      }
+    }
+    return {
+      currentPage: page,
+      nextPage,
+      results
+    };
   } catch (err) {
-    console.error(`Error fetching genre ${genre}:`, err.message);
-    return [];
+    console.error(`Error fetching genre ${genre} page ${page}:`, err.message);
+    return {
+      currentPage: page,
+      nextPage: null,
+      results: []
+    };
   }
 }
 
