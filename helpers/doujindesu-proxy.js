@@ -7,7 +7,7 @@ const cheerio = require('cheerio');
  */
 async function scrapeDoujindesu() {
   try {
-    const response = await axios.get("https://kyouka-proxy.hf.space/pages?url=https://doujindesu.tv");
+    const response = await axios.get("https://kyouka-proxy-3.hf.space/pages?url=https://doujindesu.tv");
     const html = response.data;
     const $ = cheerio.load(html);
     const results = [];
@@ -53,7 +53,7 @@ async function scrapeDoujindesu() {
 
 async function DoujindesuDetail(slug) {
   try {
-    const { data } = await axios.get(`https://kyouka-proxy.hf.space/pages?url=https://doujindesu.tv/manga/${slug}`);
+    const { data } = await axios.get(`https://kyouka-proxy-2.hf.space/pages?url=https://doujindesu.tv/manga/${slug}`);
     const $ = cheerio.load(data);
 
     const title = $("section.metadata h1.title").clone().children().remove().end().text().trim();
@@ -106,7 +106,7 @@ async function DoujindesuDetail(slug) {
 
 async function DoujindesuChapter(slug) {
   try {
-    const { data } = await axios.get(`https://kyouka-proxy.hf.space/pages?url=https://doujindesu.tv/${slug}`);
+    const { data } = await axios.get(`https://kyouka-proxy-4.hf.space/pages?url=https://doujindesu.tv/${slug}`);
     const $ = cheerio.load(data);
     const title = $("script + h1").first().text().trim();
     const dateRelease = $(".epx").first().contents().filter(function () {
@@ -130,7 +130,7 @@ async function DoujindesuChapter(slug) {
 }
 
 async function DoujindesuSearch(query) {
-  const url = `https://kyouka-proxy.hf.space/pages?url=https://doujindesu.tv/?s=${encodeURIComponent(query)}`;
+  const url = `https://kyouka-proxy-5.hf.space/pages?url=https://doujindesu.tv/?s=${encodeURIComponent(query)}`;
 
   try {
     const { data } = await axios.get(url);
