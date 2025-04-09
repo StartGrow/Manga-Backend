@@ -7,10 +7,7 @@ const chapter = require("./routers/chapter");
 const cors = require("cors");
 const helmet = require("helmet");
 
-app.use(cors({
-  origin: ['https://nekonime.xyz', 'https://anime.nekonime.xyz'],
-  credentials: true
-}));
+app.use(cors());
 
 app.use(helmet());
 app.use("/api", manga);
