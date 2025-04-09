@@ -7,22 +7,11 @@ const chapter = require("./routers/chapter");
 const cors = require("cors");
 const helmet = require("helmet");
 
-const allowedOrigins = ['https://nekonime.xyz', 'https://anime.nekonime.xyz'];
+app.use(cors({
+  origin: ['https://nekonime.xyz', 'https://anime.nekonime.xyz'],
+  credentials: true
+}));
 
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-      callback(null, true); // Mengizinkan akses
-    } else {
-      callback(new Error('Not allowed by CORS')); // Menolak akses jika domain tidak dikenali
-    }
-  },
-  methods: ['GET', 'POST'], // Sesuaikan dengan metode HTTP yang Anda izinkan
-  allowedHeaders: ['Content-Type', 'Authorization'], // Sesuaikan dengan header yang perlu diterima
-};
-
-// Menggunakan middleware CORS dengan opsi di atas
-app.use(cors(corsOptions));
 app.use(helmet());
 app.use("/api", manga);
 app.use(express.static("./public"));
