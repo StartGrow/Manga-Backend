@@ -14,6 +14,7 @@ router.get("/:slug", async (req, res) => {
   const slug = req.params.slug;
   try {
     const response = await AxiosService(`ch/${slug}/`);
+    // const response = await axios.get(`https://komikcast.id/${slug}`)
     const $ = cheerio.load(response.data);
     const content = $("#article");
     let chapter_image = [];
@@ -33,47 +34,24 @@ router.get("/:slug", async (req, res) => {
     /**
      * @Komiku
      */
-    // Perbaikan selektor gambar
-    const getPages = $('#Baca_Komik img[itemprop="image"]')
+    const getPages = $('#Baca_Komik > img')
 
+    // const getPages = $('#chimg > img')
     obj.chapter_pages = getPages.length;
     getPages.each((i, el) => {
-      const src = $(el).attr("src");
-      // Pastikan URL gambar valid dan tidak mengandung i0.wp.com
-      if (src && src.startsWith('http')) {
-        chapter_image.push({
-          chapter_image_link: src.replace('i0.wp.com/', ''),
-          image_number: i + 1,
-        });
-      }
-    });
-    
-    // Jika tidak ada gambar ditemukan, coba alternatif selektor
-    if (chapter_image.length === 0) {
-      $('#Baca_Komik img').each((i, el) => {
-        const src = $(el).attr("src");
-        if (src && src.startsWith('http')) {
-          chapter_image.push({
-            chapter_image_link: src.replace('i0.wp.com/', ''),
-            image_number: i + 1,
-          });
-        }
+      chapter_image.push({
+        chapter_image_link: $(el).attr("src").replace('i0.wp.com/',''),
+        image_number: i + 1,
       });
-    }
-    
+    });
     obj.chapter_image = chapter_image;
-    
-    if (chapter_image.length === 0) {
-      throw new Error("Tidak dapat menemukan gambar chapter");
-    }
-    
     res.json(obj);
   } catch (error) {
     console.log(error);
-    res.status(500).send({
+    res.send({
       status: false,
-      message: error.message,
-      chapter_image: []
+      message: error,
+      chapter_image :[]
     });
   }
 });
