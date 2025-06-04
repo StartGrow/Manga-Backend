@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const cheerio = require("cheerio");
 const {baseUrl, baseApi} = require("../constants/urls");
-const replaceMangaPage = "https://komiku.id/manga/";
+const replaceMangaPage = "https://komiku.org/manga/";
 const AxiosService = require("../helpers/axiosService");
 const { ManhwalandL, ManhwalandChapter, ManhwalandDetail, ManhwalandSearch, ManhwalandTags, ManhwalandGenreList } = require("../helpers/manhwaland");
 const { scrapeDoujindesu, DoujindesuDetail, DoujindesuChapter, DoujindesuSearch, DoujindesuGenres } = require("../helpers/doujindesu-proxy");
