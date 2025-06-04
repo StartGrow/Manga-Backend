@@ -12,57 +12,71 @@ router.get("/", (req, res) => {
 //chapter ----done ----
 router.get("/:slug", async (req, res) => {
   const slug = req.params.slug;
-  
   try {
     const response = await AxiosService(`ch/${slug}/`);
     const $ = cheerio.load(response.data);
-    
-    const chapterData = {
-      chapter_endpoint: `${slug}/`,
-      chapter_name: slug.split('-').join(' ').trim(),
-      title: "",
-      chapter_pages: 0,
-      chapter_image: [],
-      next_chapter: ""
-    };
+    const content = $("#article");
+    let chapter_image = [];
+    const obj = {};
+    obj.chapter_endpoint = slug + "/";
+    obj.chapter_name = slug.split('-').join(' ').trim()
 
-    // Get title
-    chapterData.title = $("#Judul > header > p > a > b").text().trim() || 
-                        $(".dsk2 h1").text().replace("Komik ", "").trim();
+    obj.title = $('#Judul > header > p > a > b').text().trim()
+    /**
+     * @Komiku
+     */
+    const getTitlePages = content.find(".dsk2")
+    getTitlePages.filter(() => {
+      obj.title = $(getTitlePages).find("h1").text().replace("Komik ", "");
+    });
 
-    // Get chapter images
-    const imageElements = $("#Baca_Komik > img[itemprop='image']");
-    chapterData.chapter_pages = imageElements.length;
-    
-    imageElements.each((i, el) => {
+    /**
+     * @Komiku
+     */
+    // Perbaikan selektor gambar
+    const getPages = $('#Baca_Komik img[itemprop="image"]')
+
+    obj.chapter_pages = getPages.length;
+    getPages.each((i, el) => {
       const src = $(el).attr("src");
-      chapterData.chapter_image.push({
-        chapter_image_link: src.replace(/i\d\.wp\.com\//, ""), // Remove all wp.com proxies
-        image_number: i + 1,
-      });
-    });
-
-    // Get next chapter link if available
-    const nextChapter = $(".pagination .next, .buttnext").attr("href");
-    if (nextChapter) {
-      chapterData.next_chapter = nextChapter.replace(/^\/|\/$/g, ""); // Remove leading/trailing slashes
-    }
-
-    res.json({
-      status: true,
-      data: chapterData
-    });
-    
-  } catch (error) {
-    console.error("Chapter error:", error);
-    res.status(500).json({
-      status: false,
-      message: error.message,
-      data: {
-        chapter_image: []
+      // Pastikan URL gambar valid dan tidak mengandung i0.wp.com
+      if (src && src.startsWith('http')) {
+        chapter_image.push({
+          chapter_image_link: src.replace('i0.wp.com/', ''),
+          image_number: i + 1,
+        });
       }
     });
+    
+    // Jika tidak ada gambar ditemukan, coba alternatif selektor
+    if (chapter_image.length === 0) {
+      $('#Baca_Komik img').each((i, el) => {
+        const src = $(el).attr("src");
+        if (src && src.startsWith('http')) {
+          chapter_image.push({
+            chapter_image_link: src.replace('i0.wp.com/', ''),
+            image_number: i + 1,
+          });
+        }
+      });
+    }
+    
+    obj.chapter_image = chapter_image;
+    
+    if (chapter_image.length === 0) {
+      throw new Error("Tidak dapat menemukan gambar chapter");
+    }
+    
+    res.json(obj);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      status: false,
+      message: error.message,
+      chapter_image: []
+    });
   }
+});
 });
 
 module.exports = router;
