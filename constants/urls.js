@@ -1,5 +1,5 @@
-const baseUrl = "https://komiku.id/";
-const baseApi = "https://api.komiku.id/";
+const baseUrl = "https://komiku.org/";
+const baseApi = "https://api.komiku.org/";
 
 module.exports = {
     baseApi,
