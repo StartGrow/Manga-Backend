@@ -12,46 +12,47 @@ router.get("/", (req, res) => {
 //chapter ----done ----
 router.get("/:slug", async (req, res) => {
   const slug = req.params.slug;
+  
   try {
-    const response = await AxiosService(`ch/${slug}/`);
-    // const response = await axios.get(`https://komikcast.id/${slug}`)
-    const $ = cheerio.load(response.data);
-    const content = $("#article");
-    let chapter_image = [];
-    const obj = {};
-    obj.chapter_endpoint = slug + "/";
-    obj.chapter_name = slug.split('-').join(' ').trim()
+    const html = await AxiosService(`ch/${slug}/`);
+    const $ = cheerio.load(html);
+    
+    const chapterData = {
+      chapter_endpoint: slug + "/",
+      chapter_name: slug.split('-').join(' ').trim(),
+      title: $("h1").first().text().replace("Komik ", "").trim(),
+      chapter_pages: 0,
+      chapter_image: []
+    };
 
-    obj.title = $('#Judul > header > p > a > b').text().trim()
-    /**
-     * @Komiku
-     */
-    const getTitlePages = content.find(".dsk2")
-    getTitlePages.filter(() => {
-      obj.title = $(getTitlePages).find("h1").text().replace("Komik ", "");
+    // Get all chapter images
+    $("#Baca_Komik img").each((i, el) => {
+      const imgSrc = $(el).attr("src");
+      if (imgSrc) {
+        chapterData.chapter_image.push({
+          chapter_image_link: imgSrc.replace('i0.wp.com/', ''),
+          image_number: i + 1
+        });
+      }
     });
 
-    /**
-     * @Komiku
-     */
-    const getPages = $('#Baca_Komik > img')
+    chapterData.chapter_pages = chapterData.chapter_image.length;
 
-    // const getPages = $('#chimg > img')
-    obj.chapter_pages = getPages.length;
-    getPages.each((i, el) => {
-      chapter_image.push({
-        chapter_image_link: $(el).attr("src").replace('i0.wp.com/',''),
-        image_number: i + 1,
-      });
-    });
-    obj.chapter_image = chapter_image;
-    res.json(obj);
+    // Get additional info from the hidden span if needed
+    const chapterInfo = $(".chapterInfo");
+    if (chapterInfo.length) {
+      chapterData.chapter_number = chapterInfo.attr("valueChapter");
+      chapterData.total_images = chapterInfo.attr("valueGambar");
+    }
+
+    res.json(chapterData);
+    
   } catch (error) {
-    console.log(error);
-    res.send({
+    console.error("Error fetching chapter:", error);
+    res.status(500).json({
       status: false,
-      message: error,
-      chapter_image :[]
+      message: "Failed to fetch chapter data",
+      chapter_image: []
     });
   }
 });
