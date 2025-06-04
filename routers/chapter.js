@@ -14,45 +14,53 @@ router.get("/:slug", async (req, res) => {
   const slug = req.params.slug;
   
   try {
-    const html = await AxiosService(`ch/${slug}/`);
-    const $ = cheerio.load(html);
+    const response = await AxiosService(`ch/${slug}/`);
+    const $ = cheerio.load(response.data);
     
     const chapterData = {
-      chapter_endpoint: slug + "/",
+      chapter_endpoint: `${slug}/`,
       chapter_name: slug.split('-').join(' ').trim(),
-      title: $("h1").first().text().replace("Komik ", "").trim(),
+      title: "",
       chapter_pages: 0,
-      chapter_image: []
+      chapter_image: [],
+      next_chapter: ""
     };
 
-    // Get all chapter images
-    $("#Baca_Komik img").each((i, el) => {
-      const imgSrc = $(el).attr("src");
-      if (imgSrc) {
-        chapterData.chapter_image.push({
-          chapter_image_link: imgSrc.replace('i0.wp.com/', ''),
-          image_number: i + 1
-        });
-      }
+    // Get title
+    chapterData.title = $("#Judul > header > p > a > b").text().trim() || 
+                        $(".dsk2 h1").text().replace("Komik ", "").trim();
+
+    // Get chapter images
+    const imageElements = $("#Baca_Komik > img[itemprop='image']");
+    chapterData.chapter_pages = imageElements.length;
+    
+    imageElements.each((i, el) => {
+      const src = $(el).attr("src");
+      chapterData.chapter_image.push({
+        chapter_image_link: src.replace(/i\d\.wp\.com\//, ""), // Remove all wp.com proxies
+        image_number: i + 1,
+      });
     });
 
-    chapterData.chapter_pages = chapterData.chapter_image.length;
-
-    // Get additional info from the hidden span if needed
-    const chapterInfo = $(".chapterInfo");
-    if (chapterInfo.length) {
-      chapterData.chapter_number = chapterInfo.attr("valueChapter");
-      chapterData.total_images = chapterInfo.attr("valueGambar");
+    // Get next chapter link if available
+    const nextChapter = $(".pagination .next, .buttnext").attr("href");
+    if (nextChapter) {
+      chapterData.next_chapter = nextChapter.replace(/^\/|\/$/g, ""); // Remove leading/trailing slashes
     }
 
-    res.json(chapterData);
+    res.json({
+      status: true,
+      data: chapterData
+    });
     
   } catch (error) {
-    console.error("Error fetching chapter:", error);
+    console.error("Chapter error:", error);
     res.status(500).json({
       status: false,
-      message: "Failed to fetch chapter data",
-      chapter_image: []
+      message: error.message,
+      data: {
+        chapter_image: []
+      }
     });
   }
 });
