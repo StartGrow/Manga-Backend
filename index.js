@@ -8,7 +8,7 @@ const cors = require("cors");
 const helmet = require("helmet");
 
 
-const corsOptions = {
+/*const corsOptions = {
   origin: function (origin, callback) {
     const allowedOrigins = ['https://anime.nekonime.xyz', 'https://nekonime.xyz', 'http://localhost:7878'];
     if (!origin || allowedOrigins.includes(origin)) {
@@ -20,8 +20,8 @@ const corsOptions = {
   credentials: true
 };
 
-app.use('*', cors(corsOptions));
-//app.use(cors());
+app.use('*', cors(corsOptions));*/
+app.use(cors());
 
 
 app.use(helmet());
