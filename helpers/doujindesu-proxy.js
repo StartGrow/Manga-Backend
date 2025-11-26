@@ -109,7 +109,7 @@ async function DoujindesuChapter(slug) {
     const { data } = await axios.get(`https://proxy.hiura.biz.id/proxy-doujin?url=https://doujindesu.tv/${slug}`);
     const $ = cheerio.load(data);
     
-    const title = $("h1").first().text().trim();
+    const title = $("title").text().replace(' - Doujindesu.XXX', '').trim();
     
     const dateText = $(".epx").first().text().trim();
     const dateRelease = dateText.split(', in')[0].trim();
