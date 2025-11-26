@@ -7,7 +7,7 @@ const cheerio = require('cheerio');
  */
 async function scrapeDoujindesu() {
   try {
-    const response = await axios.get("https://kyouka-proxy-3.hf.space/pages?url=https://doujindesu.tv");
+    const response = await axios.get("https://proxy.hiura.biz.id/proxy-doujin?url=https://doujindesu.tv");
     const html = response.data;
     const $ = cheerio.load(html);
     const results = [];
