@@ -111,11 +111,8 @@ async function DoujindesuChapter(slug) {
     
     const title = $("h1").first().text().trim();
     
-    const dateRelease = $(".epx").first().text()
-      .trim()
-      .replace(/.*,\s*/, '')
-      .replace(/\s*in.*/, '')
-      .trim();
+    const dateText = $(".epx").first().text().trim();
+    const dateRelease = dateText.split(', in')[0].trim();
     
     const images = [];
     $("#anu img").each((_, el) => {
