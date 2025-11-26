@@ -108,19 +108,28 @@ async function DoujindesuChapter(slug) {
   try {
     const { data } = await axios.get(`https://proxy.hiura.biz.id/proxy-doujin?url=https://doujindesu.tv/${slug}`);
     const $ = cheerio.load(data);
-    const title = $("script + h1").first().text().trim();
-    const dateRelease = $(".epx").first().contents().filter(function () {
-      return this.type === "text";
-    }).text().trim().replace(/,\s*in$/, '');
+    
+    const title = $("h1").first().text().trim();
+    
+    const dateRelease = $(".epx").first().text()
+      .trim()
+      .replace(/.*,\s*/, '')
+      .replace(/\s*in.*/, '')
+      .trim();
+    
     const images = [];
     $("#anu img").each((_, el) => {
       const src = $(el).attr("src");
-      if (src) images.push(encodeURI(src));
+      if (src) {
+        const encodedSrc = encodeURI(src);
+        images.push(encodedSrc);
+      }
     });
+
     return {
-      title,
-      date: dateRelease,
-      images,
+      title: title || "Judul tidak ditemukan",
+      date: dateRelease || "Tanggal tidak ditemukan",
+      images: images,
       total: images.length
     };
   } catch (error) {
