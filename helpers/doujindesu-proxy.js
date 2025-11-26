@@ -53,7 +53,7 @@ async function scrapeDoujindesu() {
 
 async function DoujindesuDetail(slug) {
   try {
-    const { data } = await axios.get(`https://kyouka-proxy-2.hf.space/pages?url=https://doujindesu.tv/manga/${slug}`);
+    const { data } = await axios.get(`https://proxy.hiura.biz.id/proxy-doujin?url=https://doujindesu.tv/manga/${slug}`);
     const $ = cheerio.load(data);
 
     const title = $("section.metadata h1.title").clone().children().remove().end().text().trim();
@@ -106,7 +106,7 @@ async function DoujindesuDetail(slug) {
 
 async function DoujindesuChapter(slug) {
   try {
-    const { data } = await axios.get(`https://kyouka-proxy-4.hf.space/pages?url=https://doujindesu.tv/${slug}`);
+    const { data } = await axios.get(`https://proxy.hiura.biz.id/proxy-doujin?url=https://doujindesu.tv/${slug}`);
     const $ = cheerio.load(data);
     const title = $("script + h1").first().text().trim();
     const dateRelease = $(".epx").first().contents().filter(function () {
@@ -130,7 +130,7 @@ async function DoujindesuChapter(slug) {
 }
 
 async function DoujindesuSearch(query) {
-  const url = `https://kyouka-proxy-5.hf.space/pages?url=https://doujindesu.tv/?s=${encodeURIComponent(query)}`;
+  const url = `https://proxy.hiura.biz.id/proxy-doujin?url=https://doujindesu.tv/?s=${encodeURIComponent(query)}`;
 
   try {
     const { data } = await axios.get(url);
@@ -168,7 +168,7 @@ async function DoujindesuSearch(query) {
 
 async function DoujindesuGenres(genre, page = 1) {
   const baseDoujindesu = 'https://doujindesu.tv';
-  const baseProxy = 'https://kyouka-proxy.hf.space/pages?url=';
+  const baseProxy = 'https://proxy.hiura.biz.id/proxy-doujin?url=';
   const url = page === 1
     ? `${baseProxy}${baseDoujindesu}/genre/${genre}?order=populer`
     : `${baseProxy}${baseDoujindesu}/genre/${genre}/page/${page}/?order=populer`;
