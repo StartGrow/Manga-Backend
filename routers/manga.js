@@ -60,7 +60,7 @@ router.get("/igodesu/search", async (req, res) => {
 });
 
 router.get("/igodesu/detail", async (req, res) => {
-  const { url } = req.query;
+  let { url } = req.query;
 
   if (!url) {
     return res.status(400).json({
@@ -70,9 +70,12 @@ router.get("/igodesu/detail", async (req, res) => {
   }
 
   try {
+    // decode URL jika masih ter-encode
+    url = decodeURIComponent(url);
+
     const apiUrl =
       "https://api.hiura.biz.id/api/nsfw/igodesu/detail?url=" +
-      url;
+      encodeURIComponent(url);
 
     const json = await AxiosService(apiUrl);
 
@@ -85,6 +88,7 @@ router.get("/igodesu/detail", async (req, res) => {
     return res.status(500).json({ error: e.message });
   }
 });
+
 
 
 router.get('/doujindesu/detail/:slug', async (req, res) => {
