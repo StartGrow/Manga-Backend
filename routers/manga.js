@@ -72,7 +72,7 @@ router.get("/igodesu/detail", async (req, res) => {
   try {
     const apiUrl =
       "https://api.hiura.biz.id/api/nsfw/igodesu/detail?url=" +
-      encodeURIComponent(url);
+      url;
 
     const json = await AxiosService(apiUrl);
 
