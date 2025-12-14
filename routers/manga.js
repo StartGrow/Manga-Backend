@@ -46,7 +46,7 @@ router.get("/igodesu/search", async (req, res) => {
     });
   }
   try {
-    const url = `https://api.hiura.biz.id/api/nsfw/igodesu?q=${encodeURIComponent(q)}&p=${encodeURIComponent(p)}`;
+    const url = `https://api.hiura.biz.id/api/nsfw/igodesu/search?q=${encodeURIComponent(q)}&p=${encodeURIComponent(p)}`;
     const json = await AxiosService(url);
 
     return res.status(200).json({
