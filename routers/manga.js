@@ -22,6 +22,20 @@ router.get('/doujindesu', async (req, res) => {
     }
 });
 
+
+router.get('/igodesu', async (req, res) => {
+    try {
+        const response = await AxiosService("https://api.hiura.biz.id/api/nsfw/igodesu");
+        res.status(200).json({
+            status: json.status,
+            message: "success",
+            result: json.data,
+        });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
 router.get('/doujindesu/detail/:slug', async (req, res) => {
     const slug = req.params.slug;
     try {
