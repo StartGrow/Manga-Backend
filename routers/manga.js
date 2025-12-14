@@ -36,6 +36,57 @@ router.get('/igodesu', async (req, res) => {
     }
 });
 
+router.get("/igodesu/search", async (req, res) => {
+  const q = req.query.q;   
+  const p = req.query.p || 1;  
+  if (!q) {
+    return res.status(400).json({
+      status: false,
+      message: "Query parameter 'q' wajib diisi",
+    });
+  }
+  try {
+    const url = `https://api.hiura.biz.id/api/nsfw/igodesu?q=${encodeURIComponent(q)}&p=${encodeURIComponent(p)}`;
+    const json = await AxiosService(url);
+
+    return res.status(200).json({
+      status: json.status,
+      message: "success",
+      result: json.data,
+    });
+  } catch (e) {
+    return res.status(500).json({ error: e.message });
+  }
+});
+
+router.get("/igodesu/detail", async (req, res) => {
+  const { url } = req.query;
+
+  if (!url) {
+    return res.status(400).json({
+      status: false,
+      message: "Query parameter 'url' wajib diisi",
+    });
+  }
+
+  try {
+    const apiUrl =
+      "https://api.hiura.biz.id/api/nsfw/igodesu/detail?url=" +
+      encodeURIComponent(url);
+
+    const json = await AxiosService(apiUrl);
+
+    return res.status(200).json({
+      status: json.status,
+      message: "success",
+      result: json.data,
+    });
+  } catch (e) {
+    return res.status(500).json({ error: e.message });
+  }
+});
+
+
 router.get('/doujindesu/detail/:slug', async (req, res) => {
     const slug = req.params.slug;
     try {
