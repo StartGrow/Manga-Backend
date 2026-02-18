@@ -305,7 +305,7 @@ router.get("/manga/page/:pagenumber", async (req, res) => {
 });
 
 // detail manga  ---- Done -----
-router.get("/manga/detail/:slug", async (req, res) => {
+/*router.get("/manga/detail/:slug", async (req, res) => {
   const slug = req.params.slug;
 
   try {
@@ -315,8 +315,6 @@ router.get("/manga/detail/:slug", async (req, res) => {
     let genre_list = [];
     let chapter = [];
     const obj = {};
-
-    /* Get Title, Type, Author, Status */
     const getMeta = element.find(".inftable > tbody").first();
     obj.title = $("#Judul > h1").text().trim();
     obj.type = $("tr:nth-child(2) > td:nth-child(2)").find("b").text();
@@ -324,11 +322,7 @@ router.get("/manga/detail/:slug", async (req, res) => {
       .text()
       .trim();
     obj.status = $(getMeta).children().eq(4).find("td:nth-child(2)").text();
-
-    /* Set Manga Endpoint */
     obj.manga_endpoint = slug;
-
-    /* Get Manga Thumbnail */
     obj.thumb = element.find(".ims > img").attr("src");
 
     element.find(".genre > li").each((idx, el) => {
@@ -339,12 +333,8 @@ router.get("/manga/detail/:slug", async (req, res) => {
     });
 
     obj.genre_list = genre_list || [];
-
-    /* Get Synopsis */
     const getSinopsis = element.find("#Sinopsis").first();
     obj.synopsis = $(getSinopsis).find("p").text().trim();
-
-    /* Get Chapter List */
     $("#Daftar_Chapter > tbody")
       .find("tr")
       .each((index, el) => {
@@ -366,6 +356,77 @@ router.get("/manga/detail/:slug", async (req, res) => {
     res.send({
       status: false,
       message: error,
+    });
+  }
+});*/
+
+router.get("/manga/detail/:slug", async (req, res) => {
+  const { slug } = req.params;
+
+  try {
+    const html = await AxiosService(`${baseUrl}/manga/${slug}/`);
+    const $ = cheerio.load(html);
+
+    const obj = {};
+    let genre_list = [];
+    let chapter = [];
+
+    obj.title = $("#Judul h1 span").text().trim() || $("#Judul h1").text().trim();
+    obj.type = $(".inftable tr")
+      .filter((i, el) => $(el).find("td:first-child").text().includes("Jenis"))
+      .find("td:last-child")
+      .text()
+      .trim();
+
+    obj.author = $(".inftable tr")
+      .filter((i, el) => $(el).find("td:first-child").text().includes("Pengarang"))
+      .find("td:last-child")
+      .text()
+      .trim();
+
+    obj.status = $(".inftable tr")
+      .filter((i, el) => $(el).find("td:first-child").text().includes("Status"))
+      .find("td:last-child")
+      .text()
+      .trim();
+
+    obj.manga_endpoint = slug;
+
+    obj.thumb = $(".ims img").attr("src") || $(".ims img").attr("data-src") || null;
+
+    $(".genre li a").each((i, el) => {
+      genre_list.push({
+        genre_name: $(el).text().trim(),
+      });
+    });
+
+    obj.genre_list = genre_list;
+
+    obj.synopsis = $(".desc").text().trim();
+
+    $("#Daftar_Chapter tbody tr").each((i, el) => {
+      const link = $(el).find("a").attr("href");
+      const title = $(el).find("a span").text().trim();
+
+      if (link && title) {
+        const endpoint = link
+          .replace(baseUrl, "")
+          .replace(/^\/|\/$/g, "");
+
+        chapter.push({
+          chapter_title: title,
+          chapter_endpoint: endpoint,
+        });
+      }
+    });
+
+    obj.chapter = chapter;
+
+    res.status(200).json(obj);
+  } catch (error) {
+    res.status(500).json({
+      status: false,
+      message: error.message,
     });
   }
 });
